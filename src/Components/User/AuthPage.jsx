@@ -124,7 +124,7 @@ export default function AuthPage({ mode, onAuth }) {
     setResetRequested(false);
     setResetLoading(true);
     try {
-      const { data } = await axios.post(`${API}/forgot-password`, { email });
+      const { data } = await axios.post(`${API}/password/forgot`, { email });
       setMessage(data.message);
       setResetRequested(true);
     } catch (error) {

@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
     }
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API}/reset-password`, { token, password });
+      const { data } = await axios.put(`${API}/password/reset/${token}`, { password, confirmPassword });
       setSuccess(true);
       setMessage(data.message);
       window.setTimeout(() => navigate("/login", { replace: true }), 1800);
