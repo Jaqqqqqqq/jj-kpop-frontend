@@ -6,7 +6,7 @@ import axios from "axios";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
 import { removeFromCart } from "../../actions/cartActions";
-import { API } from "../../api";
+import { API, getToken } from "../../api";
 import { showNotification } from "../../utils/notifications";
 
 const initialShippingInfo = {
@@ -81,7 +81,7 @@ export default function Checkout() {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     if (!token) {
       setError("Please log in again before checking out.");
@@ -92,9 +92,15 @@ export default function Checkout() {
     setLoading(true);
 
     try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      };
       const { data } = await axios.post(
         `${API}/order/new`,
-                {
+        {
           shippingInfo,
           paymentMethod,
           paymentAmount: paymentMethod === "E-payment" ? Number(paymentAmount) : undefined,
@@ -103,11 +109,7 @@ export default function Checkout() {
             quantity: item.quantity,
           })),
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        config
       );
 
       if (!data.success || !data.order?._id) {

@@ -6,6 +6,7 @@ import CustomModal from "../Common/CustomModal";
 import ProductsList from "./ProductsList";
 import AdminSidebarActions from "./AdminSidebarActions";
 import { fetchAdminProducts, removeAdminProduct, removeAdminProducts } from "../../actions/productActions";
+import { getToken } from "../../api";
 
 const API = import.meta.env.VITE_API || "http://localhost:5000/api/v1";
 
@@ -67,11 +68,14 @@ function AdminDashboard() {
       showCancel: true,
       onConfirm: async () => {
         try {
-          const token = localStorage.getItem("token");
-          const response = await fetch(`${API}/admin/product/${id}`, {
+          const config = {
             method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          });
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+          };
+          const response = await fetch(`${API}/admin/product/${id}`, config);
           const data = await response.json();
 
           if (!response.ok) {
@@ -121,15 +125,15 @@ function AdminDashboard() {
         setBulkDeleting(true);
 
         try {
-          const token = localStorage.getItem("token");
-          const response = await fetch(`${API}/admin/products/bulk-delete`, {
+          const config = {
             method: "DELETE",
             headers: {
-              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
             },
             body: JSON.stringify({ ids: idsToDelete }),
-          });
+          };
+          const response = await fetch(`${API}/admin/products/bulk-delete`, config);
           const data = await response.json();
 
           if (!response.ok) {

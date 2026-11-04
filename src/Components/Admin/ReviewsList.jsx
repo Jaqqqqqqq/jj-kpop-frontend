@@ -4,6 +4,7 @@ import CustomModal from "../Common/CustomModal";
 import "../../App.css";
 import { showNotification } from "../../utils/notifications";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API = import.meta.env.VITE_API || "http://localhost:5000/api/v1";
 
@@ -15,8 +16,13 @@ export default function ReviewsList() {
   const [selectedReview, setSelectedReview] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    fetch(`${API}/admin/products`, { headers: { Authorization: `Bearer ${token}` } })
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
+    fetch(`${API}/admin/products`, config)
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Unable to load reviews.");
@@ -36,9 +42,16 @@ export default function ReviewsList() {
   const deleteReview = async () => {
     if (!selectedReview) return;
     try {
+      const config = {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      };
       const response = await fetch(
         `${API}/admin/product/${selectedReview.product._id}/reviews/${selectedReview._id}`,
-        { method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        config
       );
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Unable to delete review.");

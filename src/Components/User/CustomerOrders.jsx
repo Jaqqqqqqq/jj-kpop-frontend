@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
-import { API } from "../../api";
+import { API, getToken } from "../../api";
 import "../../App.css";
 
 const ORDER_TABS = [
@@ -26,13 +26,13 @@ export default function CustomerOrders() {
 
     async function loadOrders() {
       try {
-        const token = localStorage.getItem("token");
-
-        const response = await fetch(`${API}/myorders`, {
+        const config = {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
           },
-        });
+        };
+        const response = await fetch(`${API}/myorders`, config);
 
         const data = await response.json();
 

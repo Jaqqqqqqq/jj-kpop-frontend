@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
-import { API } from "../../api";
+import { API, getToken } from "../../api";
 import { AUTH_SUCCESS } from "../../actions/userActions";
 import { profileValidationSchema } from "../../schemas/formSchemas";
 import { showNotification } from "../../utils/notifications";
@@ -28,9 +28,13 @@ export default function CustomerProfile() {
       setMessage("");
       setRequestError("");
       try {
-        const { data } = await axios.put(`${API}/me/update`, values, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        };
+        const { data } = await axios.put(`${API}/me/update`, values, config);
         const updatedUser = { ...user, ...data.user, role: user.role };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         dispatch({ type: AUTH_SUCCESS, payload: updatedUser });

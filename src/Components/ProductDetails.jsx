@@ -12,6 +12,7 @@ import {
   updateProductDetails,
 } from "../actions/productActions";
 import { showNotification } from "../utils/notifications";
+import { getToken } from "../api";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -103,12 +104,15 @@ export default function ProductDetails() {
 
     setReviewSaving(true);
     try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+      };
       const response = await fetch(`${API}/product/${id}/reviews`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
+        ...config,
         body: JSON.stringify({ rating: reviewRating, comment: reviewComment }),
       });
       const data = await response.json();

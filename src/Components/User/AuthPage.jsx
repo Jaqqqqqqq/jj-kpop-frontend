@@ -222,7 +222,7 @@ export default function AuthPage({ mode, onAuth }) {
 
           {!isRegister && (
             <button className="auth-forgot" type="button" onClick={handleForgotPassword} disabled={formik.isSubmitting || resetLoading}>
-              {resetLoading ? "Sending reset email..." : "Forgot password?"}
+              {resetLoading ? "Checking email..." : "Forgot password?"}
             </button>
           )}
 

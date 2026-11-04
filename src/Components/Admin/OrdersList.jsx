@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "../../App.css";
 import { showNotification } from "../../utils/notifications";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API = import.meta.env.VITE_API || "http://localhost:5000/api/v1";
 const STATUSES = [
@@ -30,11 +31,13 @@ export default function OrdersList() {
   const [message, setMessage] = useState("");
 
   const loadOrders = async () => {
-    const token = localStorage.getItem("token");
-
-    const response = await fetch(`${API}/admin/orders`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
+    const response = await fetch(`${API}/admin/orders`, config);
     const data = await response.json();
 
     if (!response.ok) {
@@ -66,7 +69,6 @@ export default function OrdersList() {
   };
 
   const updateStatus = async (orderId) => {
-    const token = localStorage.getItem("token");
     const status = statuses[orderId];
 
     setSavingId(orderId);
@@ -74,16 +76,17 @@ export default function OrdersList() {
     setError("");
 
     try {
+      const config = {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({ status }),
+      };
       const response = await fetch(
         `${API}/admin/order/${orderId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        }
+        config
       );
 
       const data = await response.json();

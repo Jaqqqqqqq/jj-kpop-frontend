@@ -7,6 +7,7 @@ import CustomModal from "../Common/CustomModal";
 import { newProductValidationSchema } from "../../schemas/formSchemas";
 import { showNotification } from "../../utils/notifications";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API = import.meta.env.VITE_API || "http://localhost:5000/api/v1";
 const NewProduct = () => {
@@ -32,9 +33,10 @@ const NewProduct = () => {
       values.images.forEach((file) => formData.append("images", file));
 
       try {
-        const { data } = await axios.post(`${API}/admin/product/new`, formData, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const config = {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        };
+        const { data } = await axios.post(`${API}/admin/product/new`, formData, config);
         if (data.success) setPopupOpen(true);
         else {
           const message = data.message || "Failed to create product.";
@@ -60,9 +62,13 @@ const NewProduct = () => {
   useEffect(() => {
     const getArtists = async () => {
       try {
-        const { data } = await axios.get(`${API}/admin/artists`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        };
+        const { data } = await axios.get(`${API}/admin/artists`, config);
         setArtists(data.artists || []);
       } catch (requestError) {
         setArtistsError(requestError.response?.data?.message || "Unable to load artist / group list.");

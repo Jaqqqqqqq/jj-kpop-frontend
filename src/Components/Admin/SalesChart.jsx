@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { API } from "../../api";
+import { API, getToken } from "../../api";
 
 function dateInputValue(date) {
   return date.toISOString().slice(0, 10);
@@ -32,9 +32,13 @@ export default function SalesChart() {
       setError("");
       try {
         const params = new URLSearchParams({ startDate, endDate });
-        const { data } = await axios.get(`${API}/admin/sales-chart?${params}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        };
+        const { data } = await axios.get(`${API}/admin/sales-chart?${params}`, config);
         if (!cancelled) setSales(data.sales || []);
       } catch (requestError) {
         if (!cancelled) {

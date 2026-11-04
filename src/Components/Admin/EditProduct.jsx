@@ -8,6 +8,7 @@ import CustomModal from "../Common/CustomModal";
 import { editProductValidationSchema } from "../../schemas/formSchemas";
 import { showNotification } from "../../utils/notifications";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API =
   import.meta.env.VITE_API || "http://localhost:5000/api/v1";
@@ -72,10 +73,13 @@ const EditProduct = () => {
       values.images.forEach((file) => formData.append("images", file));
 
       try {
+        const config = {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        };
         const { data } = await axios.put(
           `${API}/admin/product/${id}`,
           formData,
-          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+          config
         );
         if (data.success) setPopupOpen(true);
         else {
@@ -137,9 +141,14 @@ const EditProduct = () => {
   }, [id]);
 
   useEffect(() => {
-    axios.get(`${API}/admin/artists`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    }).then(({ data }) => setArtists(data.artists || [])).catch(() => {});
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
+    axios.get(`${API}/admin/artists`, config)
+      .then(({ data }) => setArtists(data.artists || [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -182,10 +191,14 @@ const EditProduct = () => {
       setLegacyImage(remainingImages[0]?.url || "");
     }
     try {
-      const { data } = await axios.delete(`${API}/admin/product/${id}/images`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
         data: { imageKeys, deleteLegacyImage: removeLegacyImage },
-      });
+      };
+      const { data } = await axios.delete(`${API}/admin/product/${id}/images`, config);
       setExistingImages(data.product.images || []);
       setLegacyImage(data.product.image || "");
     } catch (requestError) {

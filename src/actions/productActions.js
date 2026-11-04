@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API } from "../api";
+import { API, getToken } from "../api";
 
 export const PRODUCTS_REQUEST = "PRODUCTS_REQUEST";
 export const PRODUCTS_SUCCESS = "PRODUCTS_SUCCESS";
@@ -35,9 +35,13 @@ export const fetchProducts = (filters, append = false) => async (dispatch) => {
 export const fetchAdminProducts = () => async (dispatch) => {
   dispatch({ type: ADMIN_PRODUCTS_REQUEST });
   try {
-    const { data } = await axios.get(`${API}/admin/products`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
+    const { data } = await axios.get(`${API}/admin/products`, config);
     dispatch({ type: ADMIN_PRODUCTS_SUCCESS, payload: data.products || [] });
     return data.products || [];
   } catch (error) {

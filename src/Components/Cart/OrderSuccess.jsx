@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
-import { API } from "../../api";
+import { API, getToken } from "../../api";
 
 export default function OrderSuccess() {
   const { id } = useParams();
@@ -13,11 +13,14 @@ export default function OrderSuccess() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+    };
 
-    fetch(`${API}/order/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API}/order/${id}`, config)
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {

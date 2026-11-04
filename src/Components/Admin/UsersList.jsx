@@ -5,6 +5,7 @@ import axios from "axios";
 import "../../App.css";
 import CustomModal from "../Common/CustomModal";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API =
   import.meta.env.VITE_API || "http://localhost:5000/api/v1";
@@ -35,11 +36,13 @@ const UsersList = () => {
       setLoading(true);
       setError("");
 
-      const { data } = await axios.get(`${API}/admin/users`, {
+      const config = {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
         },
-      });
+      };
+      const { data } = await axios.get(`${API}/admin/users`, config);
 
       setUsers(data.users || []);
     } catch (error) {
@@ -110,14 +113,16 @@ const UsersList = () => {
 
       onConfirm: async () => {
         try {
+          const config = {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${getToken()}`,
+            },
+          };
           const { data } = await axios.put(
             `${API}/admin/user/${user._id}/status`,
             { isActive: newStatus },
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-            }
+            config
           );
 
           setUsers((currentUsers) =>

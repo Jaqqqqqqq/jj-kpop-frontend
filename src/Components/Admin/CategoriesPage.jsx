@@ -5,6 +5,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import "../../App.css";
 import { confirmAction, showNotification } from "../../utils/notifications";
 import AdminSidebarActions from "./AdminSidebarActions";
+import { getToken } from "../../api";
 
 const API = import.meta.env.VITE_API || "http://localhost:5000/api/v1";
 
@@ -21,14 +22,17 @@ export default function CategoriesPage() {
   const [artistMessage, setArtistMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const requestOptions = useCallback((method = "GET", body) => ({
-    method,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-      ...(body ? { "Content-Type": "application/json" } : {}),
-    },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  }), []);
+  const requestOptions = useCallback((method = "GET", body) => {
+    const config = {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    };
+    return config;
+  }, []);
 
   const loadLists = useCallback(async () => {
     setLoading(true);
